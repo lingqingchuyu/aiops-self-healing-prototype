@@ -6,19 +6,21 @@ AIOps 告警降噪与自愈原型
 
 在分布式、云原生环境下，传统运维面临数据爆炸、系统复杂、响应迟缓等挑战。本项目通过 AIOps 理念，构建了一个 **监控 → 检测 → 自愈 → 可视化** 的完整闭环，验证了开源工具链在运维自动化中的可行性。
 
-技术架构
+系统架构说明：
 
-![架构图](screenshots/architecture.png) 
+本项目采用分层解耦的微服务架构，所有组件均基于开源技术构建，各模块职责清晰：
 
-| 组件 | 技术选型 | 作用 | 开源协议 |
+业务服务层：基于 Python 和 Flask 框架开发，模拟订单系统的核心业务逻辑，对外暴露 /order 接口用于接收请求，并集成 Prometheus Client 库以标准格式暴露服务运行指标。该部分遵循 BSD-3-Clause 协议。
 
-| 业务服务 | Python + Flask | 模拟订单系统，暴露 `/order` 接口 | BSD-3-Clause |
-| 监控采集 | Prometheus | 抓取服务指标，存储时序数据 | Apache-2.0 |
-| 可视化 | Grafana | 展示响应时间趋势曲线 | AGPL-3.0 |
-| 自愈控制 | Python + Docker CLI | 查询 Prometheus API，超标时重启容器 | — |
-| 容器编排 | Docker Compose | 一键启动所有服务 | Apache-2.0 |
+监控采集层：采用 Prometheus 作为监控数据采集与存储组件。它通过 Pull 模式定期抓取业务服务 /metrics 接口的指标数据，并按时间序列存储，为后续分析和告警提供数据基础。Prometheus 采用 Apache-2.0 协议。
 
-快速开始
+可视化层：使用 Grafana 构建仪表盘，连接 Prometheus 数据源，将响应时间等关键指标以曲线图形式实时展示，便于观测系统状态变化趋势。Grafana 采用 AGPL-3.0 协议。
+
+自愈控制层：通过 Python 脚本实现，该脚本持续调用 Prometheus API 查询业务服务的平均响应时间，当检测到指标超过预设阈值时，自动调用 Docker CLI 命令重启业务服务容器，完成故障自愈闭环。该脚本为项目自有代码，未使用第三方开源组件。
+
+容器编排层：利用 Docker Compose 定义并管理所有容器化服务（业务服务、Prometheus、Grafana），实现一键启动、停止和依赖管理，简化部署流程。Docker Compose 采用 Apache-2.0 协议。
+
+各层之间通过标准 HTTP 接口和容器网络进行通信，形成了“数据采集 → 监控告警 → 异常检测 → 自愈执行 → 可视化反馈”的完整智能运维链路。
 
 前提条件
 - Docker Desktop（或 Docker Engine + Compose）
