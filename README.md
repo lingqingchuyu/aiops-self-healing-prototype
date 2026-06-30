@@ -24,12 +24,55 @@ AIOps 告警降噪与自愈原型
 - Docker Desktop（或 Docker Engine + Compose）
 - Python 3.8+（用于运行自愈脚本）
 
-启动项目
-```bash
-# 克隆仓库
-git clone https://github.com/你的用户名/aiops-self-healing-prototype.git
-cd aiops-self-healing-prototype
 
-# 启动所有容器
+启动所有容器
 docker compose up -d --build
+验证自愈效果
+访问 http://localhost:5000/order，多次刷新模拟请求。
+
+观察 heal_script.py 终端输出，当响应时间超过阈值时，触发自愈。
+
+执行 docker ps，查看 order-service 容器的启动时间是否刷新。
+
+<img width="2350" height="1226" alt="屏幕截图 2026-06-29 151051" src="https://github.com/user-attachments/assets/263fa40d-e44d-4716-a989-6d1c83d381fa" />
+
+自愈日志
+
+<img width="2350" height="1226" alt="屏幕截图 2026-06-29 151915" src="https://github.com/user-attachments/assets/f2a52e6f-815b-4826-9d00-9f850e51bb15" />
+
+
+Grafana 响应时间曲线
+
+<img width="2880" height="1704" alt="屏幕截图 2026-06-29 160313" src="https://github.com/user-attachments/assets/dd5874a7-5a65-4a23-9529-3a9e712627f0" />
+
+
+
+踩坑记录
+Docker 镜像加速器失效：中科大镜像源不稳定，更换为 DaoCloud 镜像源解决。
+
+Flask 与 Werkzeug 版本冲突：Flask 2.2.3 与 Werkzeug 3.1.8 不兼容，升级 Flask 至 2.3.3 并固定 Werkzeug 2.3.8 解决。
+
+
+
+开源协议
+本项目遵循 MIT License（可替换为 GPL 或 Apache，建议 MIT 更宽松）。使用到的开源工具及其协议：
+
+Prometheus：Apache-2.0
+
+Grafana：AGPL-3.0
+
+Flask：BSD-3-Clause
+
+参考资料
+Prometheus 官方文档
+
+Grafana 官方文档
+
+Docker Compose 文档
+
+本课程项目参考了 CSDN 博客《智能运维 AIOps 实战教程》的思路，并结合开源社区的最佳实践实现。
+
+
+
+
 
